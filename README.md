@@ -403,30 +403,3 @@ sample_data/           a synthetic 10-K exercising every path
 filings/               real 10-Ks (gitignored; fetched on demand)
 tests/
 ```
-
-## Limits worth stating
-
-* **The live *Claude* call has still not been executed** — no Anthropic key was
-  available. The Gemini path is verified end to end against real filings, and
-  since both providers share the ABC, the prompt and the guardrails, only the
-  Claude-specific request construction remains untested.
-* Page numbers come from the source's own pagination (PDF pages, EDGAR page
-  breaks). A filing with no page structure gets page 1 throughout.
-* Whitespace-aligned PDF tables are detected heuristically; a filing whose
-  statements are rendered as images needs an OCR loader registered.
-* The default encoder truncates at 384 tokens, so the tail of a very long
-  statement is invisible to the dense half. BM25 covers it, and answerable@8 is
-  1.00 on the eval corpus regardless, but a longer-context encoder is the next
-  lever if a bigger corpus regresses.
-* Period checking needs a year in the claim. A question with no period, against
-  a multi-year statement, cannot be checked for column slips — the guardrail
-  reports "period not stated in source" rather than guessing.
-* XBRL value lookup matches on the number, so two different concepts sharing a
-  value can both match; it is used to corroborate a period, never to override a
-  dated table cell.
-* Retrieval is exact brute-force cosine — fine to roughly tens of thousands of
-  chunks, after which `ChromaVectorStore` (or FAISS behind the same ABC) takes
-  over. BM25 now extends incrementally rather than rebuilding.
-* Auth and rate limiting are per-process and in-memory: correct for one
-  instance, and the point at which you outgrow them is the point at which you
-  want Redis.
