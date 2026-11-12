@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sec-copilot"
+version = "0.1.0"
+description = "Table-aware RAG over SEC filings with mechanically verified citations"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=1.4.0",
+    "pydantic>=2.7",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+pdf = ["pdfplumber>=0.11"]
+html = ["beautifulsoup4>=4.12", "lxml>=5.0"]
+service = ["fastapi>=0.111", "uvicorn[standard]>=0.30"]
+embeddings = ["sentence-transformers>=3.0"]
+chroma = ["chromadb>=0.5"]
+dev = ["pytest>=8.0", "httpx2>=2.0"]
+
+[project.scripts]
+sec-copilot = "sec_copilot.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sec_copilot*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
